@@ -7,7 +7,13 @@ FROM node:24-bookworm-slim AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=dependencies /app/node_modules ./node_modules
-COPY . .
+# Copy only application inputs. Private .env files never enter the image,
+# even if a GitHub upload accidentally omits .dockerignore.
+COPY package.json package-lock.json next.config.ts tsconfig.json next-env.d.ts ./
+COPY src ./src
+COPY scripts ./scripts
+COPY database ./database
+COPY public ./public
 RUN npm run build
 
 FROM node:24-bookworm-slim AS runner
@@ -20,6 +26,7 @@ COPY --from=builder --chown=nodeapp:nodeapp /app/public ./public
 COPY --from=builder --chown=nodeapp:nodeapp /app/scripts ./scripts
 COPY --from=builder --chown=nodeapp:nodeapp /app/database ./database
 COPY --from=builder --chown=nodeapp:nodeapp /app/package.json ./package.json
+COPY --from=builder --chown=nodeapp:nodeapp /app/build-info.json ./build-info.json
 USER nodeapp
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=45s CMD node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"

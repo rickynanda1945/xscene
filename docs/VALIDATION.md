@@ -1,3 +1,6 @@
+Current deployment-repair validation: see VERIFICATION-FIX.txt at the repository root.
+The notes below describe the original baseline release.
+
 # Validation report
 
 Validated November 24, 2026.

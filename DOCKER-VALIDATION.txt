@@ -1,3 +1,6 @@
+Current deployment-repair validation: see VERIFICATION-FIX.txt at the repository root.
+The notes below describe the original baseline release.
+
 XSCENE Docker validation - November 24, 2026
 
 PASS: multi-stage Node 24 Docker image built successfully.

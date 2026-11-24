@@ -7,8 +7,13 @@ import mysql, {
 export type DB = Pool | PoolConnection;
 let pool: Pool;
 export function db(): Pool {
+  for (const key of ["DB_HOST", "DB_NAME", "DB_USER", "DB_PASSWORD"]) {
+    if (!process.env[key]?.trim()) {
+      throw new Error(`Missing runtime database configuration: ${key}`);
+    }
+  }
   return (pool ??= mysql.createPool({
-    host: process.env.DB_HOST || "localhost",
+    host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT || 3306),
     database: process.env.DB_NAME,
     user: process.env.DB_USER,

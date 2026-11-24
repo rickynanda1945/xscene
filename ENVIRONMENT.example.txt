@@ -1,0 +1,23 @@
+# Example field list only. Fill secrets privately in Dokploy.
+NODE_ENV=production
+APP_URL=https://xscene.xboss.asia
+DB_HOST=ricky-dev-xscenemysql-4yb0du
+DB_PORT=3306
+DB_NAME=xscene
+DB_USER=xscene_user
+DB_PASSWORD=
+AUTH_SECRET=
+SETUP_TOKEN=
+STORAGE_DIR=/data/storage
+AUTO_MIGRATE=true
+TRUST_PROXY=true
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+MAIL_TRANSPORT=resend
+MAIL_FROM=
+RESEND_API_KEY=
+SMTP_HOST=
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=
+SMTP_PASSWORD=

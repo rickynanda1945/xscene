@@ -1,5 +1,10 @@
 # Deploy XSCENE with GitHub + Dokploy
 
+For the v1.0.1 deployment repair and a private File Mount fallback when runtime
+variables do not reach the container, start with `DEPLOY-FIX-ID.txt` at the
+repository root. That guide includes the observed failures, expected release
+markers, mount paths, and the current production-domain example.
+
 ## 1. Upload the source
 
 Extract the delivered ZIP on your computer. Upload its contents directly to the root of your GitHub repository, normally `xscene`, on branch `main`.
@@ -76,9 +81,16 @@ The Node callback path differs from the old PHP `/google-callback`. Register bot
 
 Point your staging domain's DNS to the VPS. Add the domain in Dokploy, enable HTTPS and forward traffic to container port **3000**. Keep `APP_URL` exactly aligned with that HTTPS origin, without a path or trailing login route.
 
-Click Deploy. The build runs `npm ci` and `npm run build`. At startup the container applies the included migrations, then starts Node on `0.0.0.0:3000`.
+Click Deploy. The build runs `npm ci`, checks startup-script syntax and records
+startup-file fingerprints, then builds Next.js. At startup the container checks
+the fingerprint and required runtime configuration, applies the included
+migrations, then starts Node on `0.0.0.0:3000`.
 
-Check deployment logs and `/api/health`. A healthy response is `{"status":"ok"}`. Application or database configuration errors return HTTP 503 without exposing credentials.
+Check deployment logs and `/api/health`. A healthy response in this repair is
+`{"status":"ok","release":"1.0.1-dokploy-fix"}`. Startup configuration and
+migration failures stop the container with a diagnostic log; if the HTTP server
+is running but the database is unavailable, the health route returns HTTP 503
+without exposing credentials.
 
 ## 7. Create the administrator
 

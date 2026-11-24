@@ -1,0 +1,130 @@
+XSCENE NODE.JS — PERBAIKAN DEPLOY v1.0.1
+
+TEMUAN DARI ZIP GITHUB ANDA
+- scripts/migrate.mjs yang dikirim sudah valid. Error lama pada baris 4
+  berasal dari isi file runtime yang berbeda; penyebab penimpaannya belum
+  bisa dipastikan hanya dari ZIP.
+- .dockerignore, .gitignore, .env.example dan GitHub workflow tidak ada.
+- Pemeriksaan sebelumnya membuktikan DB_HOST/DB_PORT tidak sampai ke proses.
+  Mengganti hostname yang sudah benar tidak menyelesaikan pengiriman variabel.
+
+ISI PERBAIKAN
+- Sintaks seluruh skrip startup diperiksa sebelum Next.js dibangun.
+- Log build dan startup menampilkan versi serta fingerprint file migrasi.
+- File startup yang berubah setelah image dibangun akan ditolak dengan
+  pesan yang menunjuk file tersebut.
+- Konfigurasi database yang kosong menghasilkan pesan CONFIGURATION_ERROR;
+  migrasi tidak lagi diam-diam memakai localhost.
+- Konfigurasi privat dapat dibaca dari File Mount /run/xscene.env.
+- Dockerfile menyalin input aplikasi secara eksplisit, tanpa file .env.
+- /api/health menampilkan release ketika database dapat diakses.
+
+1. CADANGKAN DAN PERTAHANKAN DATA
+Backup MySQL dan volume upload Anda terlebih dahulu. Pertahankan layanan
+xscene-mysql, database xscene, dan volume upload yang sekarang digunakan.
+Paket ini tidak menghapus tabel atau menambahkan migrasi schema baru.
+Jangan menghapus volume MySQL atau volume aset saat mengganti kode aplikasi.
+
+2. UPLOAD KE GITHUB
+Extract ZIP ini. Upload seluruh ISINYA ke root repository xscene, branch main,
+dan timpa file lama. Dockerfile, package.json, src, scripts, database, dan
+public harus langsung terlihat di root, bukan di dalam folder tambahan.
+Pastikan scripts/preflight.mjs, scripts/runtime-config.mjs, scripts/check-startup.mjs,
+dan src/lib/release.json ikut terunggah. Sertakan file tersembunyi .dockerignore,
+.gitignore, .env.example, dan folder .github jika memakai fitur upload browser.
+Jika file tersembunyi tidak muncul, file tersebut dapat dibuat melalui
+Add file -> Create new file dengan nama/path persis seperti di ZIP.
+Jangan mengunggah konfigurasi privat yang berisi kredensial ke GitHub.
+
+3. PERIKSA KONFIGURASI DOKPLOY YANG DAPAT MENIMPA FILE
+Pada aplikasi XSCENE, periksa Patches. Simpan salinan lalu nonaktifkan patch
+percobaan lama yang menimpa file startup/Dockerfile sebelum memakai paket ini.
+Di Advanced -> Volumes/Mounts, pertahankan volume upload /data/storage.
+Mount konfigurasi privat yang digunakan paket ini hanya /run/xscene.env.
+Hapus/nonaktifkan mount percobaan yang menimpa /app, /app/scripts, atau
+/app/scripts/migrate.mjs setelah menyimpan salinan konfigurasi mount tersebut.
+Mount seperti itu dapat mengganti file yang sudah benar di image.
+
+4. SUMBER DAN BUILD
+Provider: GitHub
+Repository: xscene
+Branch: main
+Build Path: /
+Build Type: Dockerfile
+Docker File: Dockerfile
+Docker Context Path: .
+Docker Build Stage: kosong
+Klik Save setelah perubahan.
+
+5. KONFIGURASI PRIVAT TANPA SSH
+Karena Environment sebelumnya tidak diteruskan ke container, gunakan File Mount
+sebagai solusi sementara. Di Advanced -> Volumes/Mounts -> Add File Mount:
+  File Path: xscene.env
+  Mount Path: /run/xscene.env
+  Content: seluruh konfigurasi privat aplikasi Anda.
+
+Gunakan ENVIRONMENT.example.txt sebagai daftar kolom dan isi password/secret
+sendiri di panel Dokploy. File contoh tidak berisi kredensial aktif.
+Sertakan konfigurasi Google/email yang telah Anda miliki jika ingin login publik.
+Tulis satu KEY=value per baris. Jika nilainya memuat # atau spasi, apit dengan
+tanda kutip ganda. @ pada password boleh digunakan. Pertahankan password persis.
+Simpan File Mount. Pastikan file dapat dibaca oleh user aplikasi UID 1001;
+jika startup menampilkan EACCES, minta pengelola memperbaiki izin file mount.
+
+Environment runtime mempunyai prioritas di atas File Mount. Bila Anda mempertahankan
+kedua sumber, nilainya harus selaras. Setelah pengelola memperbaiki pengiriman
+Environment dan membuktikan seluruh nilai terbaca, File Mount dapat dilepas.
+Jangan melepasnya sebelum koneksi melalui Environment saja terbukti bekerja.
+
+Password/token yang pernah terlihat dalam screenshot perlu diganti. Jika mengganti
+password database, ubah password user MySQL sebenarnya juga, lalu selaraskan konfigurasi.
+
+6. DEPLOY DAN PERIKSA VERSI
+Klik Deploy manual; commit GitHub saja tidak memicu deploy jika Autodeploy mati.
+Log BUILD harus memuat:
+  [XSCENE BUILD] release=1.0.1-dokploy-fix migration=...; startup syntax verified.
+Log aplikasi harus memuat release dan fingerprint migrasi yang sama:
+  [XSCENE START] release=1.0.1-dokploy-fix migration=...
+  [DB CHECK] ... hostConfigured: true ... usingLocalhost: false ...
+  [XSCENE START] Runtime configuration verified.
+  Applied 001_schema.sql
+  ...
+  Migration complete. Existing rows and ownership preserved.
+
+Tidak ada marker versi baru di log BUILD: periksa repository/branch/commit yang
+benar-benar dibangun dan apakah Patches mengganti Dockerfile atau skrip pemeriksaan.
+Marker BUILD baru tetapi START lama: image/container lama masih dijalankan;
+pengelola perlu memeriksa pembaruan layanan Docker.
+Pesan 'Startup file differs': ada file di container yang berbeda dari image;
+periksa File Mounts. Ini pemeriksaan diagnostik, bukan tanda tangan keamanan.
+hostConfigured false: konfigurasi belum terbaca; periksa isi/path File Mount
+dan penyimpanan Environment. Jangan menyalin password ke log atau chat.
+ENOTFOUND: hostname internal/network tidak benar.
+ECONNREFUSED/ETIMEDOUT: periksa kesiapan MySQL, port dan network internal.
+ER_ACCESS_DENIED_ERROR: periksa user/password serta izin MySQL.
+ER_BAD_DB_ERROR: periksa apakah database xscene ada di layanan MySQL tersebut.
+
+7. DOMAIN DAN HEALTH
+Domain aplikasi: xscene.xboss.asia
+Container Port pada tab Domains: 3000
+APP_URL: https://xscene.xboss.asia
+Pertahankan pengaturan Cloudflare/DNS/HTTPS yang sesuai cara koneksi server Anda.
+Buka https://xscene.xboss.asia/api/health
+Respons sukses paket ini:
+  {"status":"ok","release":"1.0.1-dokploy-fix"}
+Jika startup dan database berhasil tetapi domain tetap 502, pengelola perlu
+memeriksa routing Dokploy/Traefik/Cloudflare. Keberhasilan lokal tidak menjamin
+konfigurasi jaringan server produksi.
+
+8. LOGIN
+Setup admin pertama: https://xscene.xboss.asia/setup
+Gunakan SETUP_TOKEN privat, email admin, dan password baru.
+Jika admin berpassword sudah ada, setup tertutup; gunakan akun yang sudah ada.
+Admin login: https://xscene.xboss.asia/admin-login
+User login: https://xscene.xboss.asia/login
+Callback Google: https://xscene.xboss.asia/auth/callback
+Jika konfigurasi hanya berada di File Mount, reset admin melalui terminal
+menggunakan: node --env-file=/run/xscene.env scripts/create-admin.mjs EMAIL_ADMIN
+Password dimasukkan secara interaktif, bukan sebagai argumen.
+
+Jika gagal, kirim marker START/DB CHECK dan kode error terbaru, bukan isi Environment.

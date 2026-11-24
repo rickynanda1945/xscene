@@ -1,20 +1,10 @@
 import mysql from "mysql2/promise";
 import { readFile } from "node:fs/promises";
+import { databaseConfig, ConfigurationError } from "./runtime-config.mjs";
 
-console.log("[DB CHECK]", {
-  hostConfigured: Boolean(process.env.DB_HOST?.trim()),
-  usingLocalhost: ["", "localhost", "127.0.0.1"].includes(
-    (process.env.DB_HOST || "").trim()
-  ),
-  portConfigured: Boolean(process.env.DB_PORT?.trim())
-});
-
+async function migrate() {
 const connection = await mysql.createConnection({
-  host: process.env.DB_HOST || "localhost",
-  port: Number(process.env.DB_PORT || 3306),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  ...databaseConfig(),
   multipleStatements: false,
   charset: "utf8mb4",
   timezone: "Z"
@@ -90,4 +80,25 @@ try {
     .catch(() => {});
 
   await connection.end();
+}
+}
+
+try {
+  await migrate();
+} catch (error) {
+  const hints = {
+    ENOTFOUND: "DB_HOST could not be resolved. Check the MySQL internal hostname and shared Docker network.",
+    EAI_AGAIN: "MySQL DNS lookup temporarily failed. Check the shared Docker network.",
+    ECONNREFUSED: "MySQL refused the connection. Check that MySQL is running and DB_PORT is its internal port.",
+    ETIMEDOUT: "The MySQL connection timed out. Check service readiness and network access.",
+    ER_ACCESS_DENIED_ERROR: "MySQL rejected the account. Check DB_USER, DB_PASSWORD and database grants.",
+    ER_BAD_DB_ERROR: "DB_NAME does not exist on the selected MySQL service.",
+  };
+  if (error instanceof ConfigurationError) {
+    console.error(`[XSCENE MIGRATION] ${error.code}: ${error.message}`);
+  } else {
+    const code = /^[A-Z0-9_]+$/.test(error?.code || "") ? error.code : "MIGRATION_FAILED";
+    console.error(`[XSCENE MIGRATION] ${code}: ${hints[code] || "Migration failed. Check the database schema and migration privileges."}`);
+  }
+  process.exitCode = 1;
 }

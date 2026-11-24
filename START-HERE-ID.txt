@@ -1,3 +1,5 @@
+PEMBARUAN DEPLOY v1.0.1: baca DEPLOY-FIX-ID.txt terlebih dahulu.
+
 XSCENE APP - NODE.JS MANDIRI
 
 Ini aplikasi lengkap Node.js/Next.js. Tidak memerlukan WordPress atau PHP.

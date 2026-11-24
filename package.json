@@ -1,16 +1,17 @@
 {
   "name": "xscene-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "engines": {
     "node": ">=24.0.0 <25"
   },
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0",
-    "build": "next build --webpack",
+    "build": "npm run check:startup && next build --webpack",
+    "check:startup": "node scripts/check-startup.mjs",
     "start": "next start --hostname 0.0.0.0",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/*.test.ts",
+    "test": "tsx --test tests/*.test.ts tests/*.test.mjs",
     "db:migrate": "node --env-file-if-exists=.env scripts/migrate.mjs",
     "secrets": "node scripts/secrets.mjs",
     "admin:create": "node --env-file-if-exists=.env scripts/create-admin.mjs",

@@ -1,0 +1,41 @@
+XSCENE DEPLOYMENT REPAIR v1.0.1 — VERIFICATION
+
+Uploaded source inspected: xscene-main.zip
+- Uploaded migrate.mjs passed node --check. Its line 4 is console.log, not });.
+- Uploaded start-container.sh passed sh -n.
+- Uploaded archive omitted all dotfiles: .dockerignore, .gitignore,
+  .env.example and .github/workflows/ci.yml were missing.
+- A ZIP alone cannot prove why the deployed container ran different source
+  or why Dokploy did not propagate runtime environment variables.
+
+Repair validation:
+- npm test: 89 tests passed (79 existing + 10 startup/configuration tests).
+- npm run typecheck: passed.
+- npm run build: passed, including startup-script syntax checks.
+- Docker production image: built with Node 24 bookworm slim.
+- Isolated MySQL 8.4: migrations and HTTP health succeeded.
+- File Mount only (/run/xscene.env): app and migrations received configuration
+  even when Docker itself had no DB_HOST environment value.
+- Landing, user login, administrator login and first-admin setup: HTTP 200.
+- Non-root UID 1001: could write the mounted asset volume.
+- Container recreation: migrations reran and preserved a test user and file.
+- Actual image without required configuration: clear CONFIGURATION_ERROR,
+  without attempting an implicit localhost connection.
+- Runtime image contained no private .env file or temporary build CA secret.
+- Automated source scan detected no private env file or common credential tokens.
+
+Build-environment note:
+The first Docker npm-ci attempt hit SELF_SIGNED_CERT_IN_CHAIN because this
+managed test environment uses a TLS proxy. The verification build supplied
+its trusted CA bundle via an ephemeral BuildKit secret for npm-ci only.
+TLS verification stayed enabled. Neither that CA secret, the test Dockerfile,
+nor any test credential is included in this delivery. The packaged Dockerfile
+uses standard npm-ci and standard TLS trust, as appropriate for normal hosting.
+
+Limits:
+These checks ran in an isolated local environment, not the user's VPS.
+Live Dokploy Environment propagation, production File Mounts/Patches, current
+image selection, MySQL grants, Traefik, Cloudflare and public OAuth/email delivery
+remain dependent on the user's hosting configuration. New release/fingerprint
+logs make those failures easier to distinguish. No changes were applied to
+GitHub or the user's live hosting by the assistant.
