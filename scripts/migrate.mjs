@@ -1,5 +1,12 @@
 import mysql from "mysql2/promise";
 import { readFile } from "node:fs/promises";
+console.log("[DB CHECK]", {
+  hostConfigured: Boolean(process.env.DB_HOST?.trim()),
+  usingLocalhost: ["", "localhost", "127.0.0.1"].includes(
+    (process.env.DB_HOST || "").trim()
+  ),
+  portConfigured: Boolean(process.env.DB_PORT?.trim())
+});
 const connection = await mysql.createConnection({
   host: process.env.DB_HOST || "localhost",
   port: Number(process.env.DB_PORT || 3306),
