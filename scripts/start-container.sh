@@ -1,6 +1,13 @@
 #!/bin/sh
 set -eu
-if [ "${AUTO_MIGRATE:-true}" = "true" ]; then
-  node scripts/migrate.mjs
+
+set --
+if [ -f "${XSCENE_ENV_FILE:-/run/xscene.env}" ]; then
+  set -- "--env-file=${XSCENE_ENV_FILE:-/run/xscene.env}"
 fi
-exec node server.js
+
+if node "$@" -e 'process.exit((process.env.AUTO_MIGRATE ?? "true") === "true" ? 0 : 1)'; then
+  node "$@" scripts/migrate.mjs
+fi
+
+exec node "$@" server.js
