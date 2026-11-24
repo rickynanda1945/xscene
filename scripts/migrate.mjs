@@ -6,6 +6,10 @@ console.log("[DB CHECK]", {
     (process.env.DB_HOST || "").trim()
   ),
   portConfigured: Boolean(process.env.DB_PORT?.trim())
+  console.log("[DB CHECK]", {
+  host: process.env.DB_HOST || "(missing)",
+  port: process.env.DB_PORT || "(missing)"
+});
 });
 const connection = await mysql.createConnection({
   host: process.env.DB_HOST || "localhost",
