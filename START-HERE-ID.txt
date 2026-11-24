@@ -1,0 +1,30 @@
+XSCENE APP - NODE.JS MANDIRI
+
+Ini aplikasi lengkap Node.js/Next.js. Tidak memerlukan WordPress atau PHP.
+Ini bukan patch untuk public_html versi lama.
+
+1. Ekstrak ZIP di komputer Anda.
+2. Upload seluruh isi ZIP ke ROOT repository GitHub xscene, branch main.
+   package.json dan Dockerfile harus langsung terlihat di halaman utama repository.
+   Jangan upload folder node_modules, .next, .env atau data pengguna.
+3. Dokploy: pilih GitHub > repository xscene > branch main > Build Path /
+   Build Type Dockerfile > Dockerfile Path Dockerfile > Save.
+4. Buat database MySQL di Dokploy dan catat hostname internalnya.
+5. Tambahkan volume permanen pada aplikasi dengan Mount Path /data/storage.
+6. Isi Environment sesuai .env.example. Password/API key diisi di Dokploy, bukan GitHub.
+   AUTH_SECRET dan SETUP_TOKEN perlu nilai acak berbeda, masing-masing minimal 32 karakter.
+7. Pasang domain staging dan HTTPS; arahkan ke port aplikasi 3000.
+8. Deploy. Database dimigrasikan otomatis saat container mulai.
+9. Buka https://DOMAIN_ANDA/setup untuk membuat admin pertama menggunakan SETUP_TOKEN.
+   Login admin selanjutnya: https://DOMAIN_ANDA/admin-login
+10. Login pengguna: /login, melalui Google atau kode OTP email.
+
+Panduan rinci berbahasa Inggris: docs/DOKPLOY.md
+Panduan pindah data PHP lama: docs/MIGRATION.md
+Informasi fitur/operasional: README.md dan docs/OPERATIONS.md
+
+Google callback untuk versi Node.js: https://DOMAIN_ANDA/auth/callback
+Data upload harus tersimpan di volume permanen agar tidak hilang saat deploy ulang.
+Gunakan staging dan backup sebelum memindahkan domain utama.
+
+Kode sudah diuji lokal; GitHub dan website live Anda belum diubah otomatis.

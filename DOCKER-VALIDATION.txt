@@ -1,0 +1,20 @@
+XSCENE Docker validation - November 24, 2026
+
+PASS: multi-stage Node 24 Docker image built successfully.
+PASS: production Next.js standalone server starts as non-root UID 1001.
+PASS: startup migrations run against official MySQL 8.4.
+PASS: /api/health returns healthy status.
+PASS: first administrator created using the browser setup page.
+PASS: valid PNG uploaded through the authenticated API into /data/storage.
+PASS: actual product prompt generated and saved in MySQL.
+PASS: application container removed and recreated with the same named storage volume.
+PASS: original database project, authenticated session and exact image bytes remain available.
+PASS: runtime imports for mysql2, sharp, nodemailer and bcryptjs are present.
+PASS: interactive admin CLI loads and shows its usage guard without exposing a password.
+
+The managed development network required its HTTPS proxy CA for npm downloads.
+A temporary test Dockerfile mounted that CA as a BuildKit secret. The release
+Dockerfile uses normal verified npm HTTPS and contains no managed-environment CA,
+proxy credentials, test passwords or customer environment values.
+
+The source ZIP is ready for GitHub/Dokploy. It has not been deployed to the user's VPS.

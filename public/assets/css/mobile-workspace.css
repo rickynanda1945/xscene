@@ -1,0 +1,17 @@
+.mobile-app-nav{display:none}
+@media(max-width:720px){
+ body{padding-bottom:calc(82px + env(safe-area-inset-bottom,0px))}
+ .mobile-app-nav{position:fixed;left:0;right:0;bottom:0;z-index:50;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;height:calc(72px + env(safe-area-inset-bottom,0px));padding:5px 10px calc(5px + env(safe-area-inset-bottom,0px));background:#fff;border-top:1px solid #e6e6ed;box-shadow:0 -5px 25px #18182509}
+ .mobile-app-nav>a,.mobile-app-nav>button{font-family:Arial,Helvetica,sans-serif;border:0;background:none;text-decoration:none;color:#8b8b98;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:48px;font-size:9px;padding:4px;cursor:pointer;min-width:0}
+ .mobile-app-nav svg{width:20px;height:20px;flex-shrink:0}
+ .mobile-app-nav .active{color:#d52013;font-weight:bold}
+ .mobile-app-nav .mobile-generate{position:relative;transform:translateY(-12px);background:#e10600;color:#fff;border:5px solid #fff;border-radius:50%;height:66px;width:66px;justify-self:center;gap:3px;box-shadow:0 4px 14px #e1060030;font-size:8px;font-weight:600}
+ .mobile-app-nav .mobile-generate svg{width:22px;height:22px}
+ .mobile-app-nav .mobile-generate:disabled{background:#c9c9d1;box-shadow:none;cursor:default}
+ .mobile-app-nav :focus-visible{outline:3px solid #ffaaa1;outline-offset:2px}
+ .mobile-library-links{display:grid;gap:6px}.mobile-library-links a{display:flex;align-items:center;gap:12px;border:1px solid #eeeef3;border-radius:7px;padding:14px;color:#62626f;font-size:12px}.mobile-library-links svg{width:19px;height:19px}.mobile-library-links a svg:last-child{margin-left:auto;width:15px}
+ #toast{bottom:calc(97px + env(safe-area-inset-bottom,0px))}
+ .app-footer{padding-bottom:20px}.sidebar.open{z-index:60;height:100dvh;overflow-y:auto}.mobile-menu{display:block}
+}
+@media(prefers-reduced-motion:reduce){.mobile-app-nav *{transition:none!important}}
+@media(max-width:720px){:root{--sidebar:0px}.sidebar{width:224px;transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.sidebar .nav-link{flex-shrink:0}.sidebar .sidebar-bottom{flex-shrink:0}}
