@@ -11,7 +11,10 @@ console.log("[DB CHECK]", {
   port: process.env.DB_PORT || "(missing)"
 });
 });
-const connection = await mysql.createConnection({
+const connection = await [DB CHECK] {
+  host: 'ricky-dev-xscenemysql-4yb0du',
+  port: '3306'
+} mysql.createConnection({
   host: process.env.DB_HOST || "localhost",
   port: Number(process.env.DB_PORT || 3306),
   user: process.env.DB_USER,
