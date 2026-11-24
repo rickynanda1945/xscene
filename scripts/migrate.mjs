@@ -1,6 +1,8 @@
 import mysql from "mysql2/promise";
 import { readFile } from "node:fs/promises";
-console.log("[DB CHECK]", {
+
+});
+const connection = await console.log("[DB CHECK]", {
   hostConfigured: Boolean(process.env.DB_HOST?.trim()),
   usingLocalhost: ["", "localhost", "127.0.0.1"].includes(
     (process.env.DB_HOST || "").trim()
@@ -9,9 +11,7 @@ console.log("[DB CHECK]", {
   console.log("[DB CHECK]", {
   host: process.env.DB_HOST || "(missing)",
   port: process.env.DB_PORT || "(missing)"
-});
-});
-const connection = await [DB CHECK] {
+}); [DB CHECK] {
   host: 'ricky-dev-xscenemysql-4yb0du',
   port: '3306'
 } mysql.createConnection({
